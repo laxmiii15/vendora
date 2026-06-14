@@ -30,4 +30,13 @@ export class UsersService {
       where: { email },
     });
   }
+
+  async create(data: {
+    email: string;
+    password: string;
+    firstName?: string;
+    lastName?: string;
+  }) {
+    return this.prisma.user.create({ data });
+  }
 }
