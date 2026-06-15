@@ -18,6 +18,7 @@ import { AuthModule } from './auth/auth.module';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       playground: true,
+      context: ({ req }) => ({ req }),
     }),
 
     PrismaModule,
