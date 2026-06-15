@@ -4,26 +4,26 @@ import { UserRole, UserStatus } from '../../generated/prisma/client';
 @ObjectType()
 export class User {
   @Field(() => ID)
-  id: string;
+  id!: string;
 
   @Field()
-  email: string;
+  email!: string;
 
-  @Field({ nullable: true })
-  firstName?: string | null;
+  @Field(() => String, { nullable: true })
+  firstName!: string | null;
 
-  @Field({ nullable: true })
-  lastName?: string | null;
+  @Field(() => String, { nullable: true })
+  lastName!: string | null;
 
   @Field(() => String)
-  role: UserRole;
+  role!: UserRole;
 
   @Field(() => String)
-  status: UserStatus;
+  status!: UserStatus;
 
   @Field()
-  createdAt: Date;
+  createdAt!: Date;
 
   @Field()
-  updatedAt: Date;
+  updatedAt!: Date;
 }
