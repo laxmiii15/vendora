@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -34,7 +35,7 @@ export class AuthService {
     const existing = await this.usersService.findByEmail(input.email);
 
     if (existing) {
-      throw new ConflictException('Email is already registered');
+      throw new BadRequestException('Email is already registered');
     }
 
     const hashedPassword = await bcrypt.hash(input.password, this.saltRounds);
