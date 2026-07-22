@@ -4,6 +4,10 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { GqlJwtAuthGuard } from '../auth/guards/auth.guard';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
+import { UserRole } from '../generated/prisma/client';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
+
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -16,11 +20,15 @@ export class UsersResolver {
   }
 
   @Query(() => [User], { name: 'users' })
+  @UseGuards(GqlJwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   findAll() {
     return this.usersService.findAll();
   }
 
   @Query(() => User, { name: 'user' })
+  @UseGuards(GqlJwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   findById(@Args('id') id: string) {
     return this.usersService.findById(id);
   }
