@@ -23,15 +23,37 @@ type AuthResponse {
   user: User!
 }
 
+type Product {
+  id: ID!
+  name: String!
+  slug: String!
+  description: String
+  price: Float!
+  stock: Int!
+  status: ProductStatus!
+  sellerId: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  OUT_OF_STOCK
+  ARCHIVED
+}
+
 type Query {
   me: User!
   users: [User!]!
   user(id: String!): User!
+  getProducts: [Product!]!
 }
 
 type Mutation {
   register(input: RegisterInput!): AuthResponse!
   login(input: LoginInput!): AuthResponse!
+  createProduct(input: CreateProductInput!): Product!
 }
 
 input RegisterInput {
@@ -44,4 +66,13 @@ input RegisterInput {
 input LoginInput {
   email: String!
   password: String!
+}
+
+input CreateProductInput {
+  name: String!
+  description: String
+  price: Float!
+  stock: Int! = 0
+  slug: String!
+  status: ProductStatus!
 }

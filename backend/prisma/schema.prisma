@@ -7,6 +7,7 @@ generator client {
 datasource db {
   provider = "sqlite"
 }
+
 enum UserRole {
   CUSTOMER
   SELLER
@@ -20,7 +21,7 @@ enum UserStatus {
   PENDING_VERIFICATION
 }
 
-enum ProductStatus{
+enum ProductStatus {
   DRAFT
   ACTIVE
   OUT_OF_STOCK
@@ -46,20 +47,20 @@ model User {
 }
 
 model Product {
-  id      String     @id @default(cuid())
-  name  String
-  slug  String   @unique
-  description  String?
-price     Int
-stock   Int   @default(0)
-status  ProductStatus @default(DRAFT)
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique
+  description String?
+  price       Int
+  stock       Int           @default(0)
+  status      ProductStatus @default(DRAFT)
 
-sellerId String
-seller  User  @relation(fields: [sellerId], references: [id])
+  sellerId String
+  seller   User   @relation(fields: [sellerId], references: [id])
 
-createdAt DateTime @default(now())
-updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-@@index([sellerId])
-@@index([status])
+  @@index([sellerId])
+  @@index([status])
 }
