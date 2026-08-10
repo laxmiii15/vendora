@@ -54,6 +54,7 @@ type Mutation {
   register(input: RegisterInput!): AuthResponse!
   login(input: LoginInput!): AuthResponse!
   createProduct(input: CreateProductInput!): Product!
+  updateProduct(id: ID!, input: UpdateProductInput!): Product!
 }
 
 input RegisterInput {
@@ -75,4 +76,13 @@ input CreateProductInput {
   stock: Int! = 0
   slug: String!
   status: ProductStatus!
+}
+
+input UpdateProductInput {
+  name: String
+  description: String
+  price: Float
+  stock: Int = 0
+  slug: String
+  status: ProductStatus
 }

@@ -1,7 +1,7 @@
-import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProductService } from "./product.service";
 import { Product } from "./entities/product.entity";
-import { CreateProductInput } from "./dto/product.input";
+import { CreateProductInput, UpdateProductInput } from "./dto/product.input";
 import { UseGuards } from "@nestjs/common";
 import { GqlJwtAuthGuard } from "src/auth/guards/auth.guard";
 import { CurrentUser } from "src/auth/decorators/current-user.decorator";
@@ -28,5 +28,15 @@ export class ProductResolver {
         return this.productService.createProduct(createProductInput, user)
     }
 
+    @Mutation(() => Product)
+    @UseGuards(GqlJwtAuthGuard)
+    async updateProduct(
+    @CurrentUser() user: User,
+    @Args('id', { type: () => ID }) id: string,
+    @Args('input') input: UpdateProductInput,
+    ) {
+        return this.productService.updateProduct(user, id, input);
+    }
 
 }
+

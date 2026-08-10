@@ -1,5 +1,5 @@
-import { Field, InputType, Int, registerEnumType } from '@nestjs/graphql';
-import { IsString, MinLength, Min, IsInt, IsOptional } from 'class-validator';
+import { Field, InputType, Int, PartialType, registerEnumType } from '@nestjs/graphql';
+import { IsString, MinLength, Min, IsInt, IsOptional, IsEnum } from 'class-validator';
 import { ProductStatus } from 'src/generated/prisma/enums';
 
 
@@ -34,7 +34,12 @@ export class CreateProductInput {
   slug: string;
 
   @Field(() => ProductStatus)
+  @IsEnum(ProductStatus)
   status: ProductStatus;
 
   
 }
+
+@InputType()
+export class UpdateProductInput extends PartialType(CreateProductInput){}
+
