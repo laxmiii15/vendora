@@ -31,12 +31,22 @@ export class ProductResolver {
     @Mutation(() => Product)
     @UseGuards(GqlJwtAuthGuard)
     async updateProduct(
-    @CurrentUser() user: User,
-    @Args('id', { type: () => ID }) id: string,
-    @Args('input') input: UpdateProductInput,
+        @CurrentUser() user: User,
+        @Args('id', { type: () => ID }) id: string,
+        @Args('input') input: UpdateProductInput,
     ) {
         return this.productService.updateProduct(user, id, input);
     }
+
+    @Mutation(() => Product)
+    @UseGuards(GqlJwtAuthGuard)
+    async deleteProduct(
+        @CurrentUser() user: User,
+        @Args('id', { type: () => ID }) id: string,
+    ) {
+        return this.productService.deleteProduct(user, id);
+    }
+
 
 }
 

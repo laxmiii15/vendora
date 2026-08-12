@@ -50,4 +50,25 @@ async updateProduct(user: User, id: string, updateProductInput: UpdateProductInp
       data: updateProductInput,
     });
   }
+
+  async deleteProduct(user: User, id: string) {
+
+    const product = await this.prisma.product.findUnique({
+      where:{
+        id,
+      }
+    });
+    if(!product) {
+      throw new NotFoundException("product not found")
+    }
+
+    return this.prisma.product.delete({
+      where: {
+        id,
+      },
+      
+    });
+
   }
+
+}
