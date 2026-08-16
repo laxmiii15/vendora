@@ -1,0 +1,16 @@
+{
+  // Practice mode: no suggestions appear on their own.
+  // Press Ctrl+Space to summon IntelliSense when you actually want it.
+  "editor.inlineSuggest.enabled": false,
+  "editor.quickSuggestions": {
+    "other": "off",
+    "comments": "off",
+    "strings": "off"
+  },
+  "editor.suggestOnTriggerCharacters": false,
+  "editor.acceptSuggestionOnEnter": "off",
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "editor.tabCompletion": "off",
+  "editor.parameterHints.enabled": false,
+  "editor.wordBasedSuggestions": "off"
+}
