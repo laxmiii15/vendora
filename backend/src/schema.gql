@@ -43,11 +43,20 @@ enum ProductStatus {
   ARCHIVED
 }
 
+type Category {
+  id: ID!
+  name: String!
+  slug: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   me: User!
   users: [User!]!
   user(id: String!): User!
   getProducts: [Product!]!
+  getCategories: [Category!]!
 }
 
 type Mutation {
@@ -56,6 +65,7 @@ type Mutation {
   createProduct(input: CreateProductInput!): Product!
   updateProduct(id: ID!, input: UpdateProductInput!): Product!
   deleteProduct(id: ID!): Product!
+  createCategory(input: CreateCategoryInput!): Category!
 }
 
 input RegisterInput {
@@ -86,4 +96,9 @@ input UpdateProductInput {
   stock: Int = 0
   slug: String
   status: ProductStatus
+}
+
+input CreateCategoryInput {
+  name: String!
+  slug: String!
 }

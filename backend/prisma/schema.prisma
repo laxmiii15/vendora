@@ -64,3 +64,11 @@ model Product {
   @@index([sellerId])
   @@index([status])
 }
+
+model category {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
