@@ -26,8 +26,14 @@ export class CategoriesResolver {
 
     @Mutation(() => Category)
     @UseGuards(GqlJwtAuthGuard)
-    updateCategory(@CurrentUser() user: User, @Args("id")id: string, @Args("input")updateCategoryInput: UpdateCategoryInput) {
+    updateCategory(@CurrentUser() user: User, @Args("id") id: string, @Args("input") updateCategoryInput: UpdateCategoryInput) {
         return this.categoriesService.updateCategory(updateCategoryInput, user, id);
+    }
+
+    @Mutation(() => Category)
+    @UseGuards(GqlJwtAuthGuard)
+    deleteCategory(@CurrentUser() user: User, @Args("id") id: string,) {
+        return this.categoriesService.deleteCategory(user, id);
     }
 
 
