@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Category } from './entities/category.entity';
-import { CreateCategoryInput } from './dto/create-category.input';
+import { CreateCategoryInput, UpdateCategoryInput } from './dto/create-category.input';
 import { User } from 'src/users/entities/user.entity';
 
 
 @Injectable()
 export class CategoriesService {
-constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService) { }
 
     async getCategories(): Promise<Category[]> {
         const categories = await this.prisma.category.findMany()
@@ -19,12 +19,33 @@ constructor(private readonly prisma: PrismaService) {}
             data: {
                 name: createCategoryInput.name,
                 slug: createCategoryInput.slug,
-                
+
 
             }
         })
         return newCategory
     }
 
-    
+    async updateCategory(updateCategoryInput: UpdateCategoryInput, user: User, id: string) {
+        const category = await this.prisma.category.findUnique({
+            where: {
+                id,
+            }
+
+        });
+        if (!category) {
+            throw new NotFoundException("category not found")
+        }
+
+        return this.prisma.category.update({
+            where: {
+                id,
+            },
+            data: updateCategoryInput,
+        });
+
+
+    }
+
+
 }

@@ -66,6 +66,7 @@ type Mutation {
   updateProduct(id: ID!, input: UpdateProductInput!): Product!
   deleteProduct(id: ID!): Product!
   createCategory(input: CreateCategoryInput!): Category!
+  updateCategory(id: String!, input: UpdateCategoryInput!): Category!
 }
 
 input RegisterInput {
@@ -99,6 +100,11 @@ input UpdateProductInput {
 }
 
 input CreateCategoryInput {
+  name: String!
+  slug: String!
+}
+
+input UpdateCategoryInput {
   name: String!
   slug: String!
 }
