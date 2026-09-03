@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: postgres:17
+    ports:
+      - "5430:5432"
+    environment:
+      POSTGRES_USER: laxmii
+      POSTGRES_PASSWORD: laxmi12
+      POSTGRES_DB: vendordb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:
