@@ -2,7 +2,9 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
+import { Request } from 'express';
 import { join } from 'path';
+import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
@@ -20,15 +22,16 @@ import { CategoriesModule } from './categories/categories.module';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       playground: true,
-      context: ({ req }) => ({ req }),
+      context: ({ req }: { req: Request }) => ({ req }),
     }),
 
     PrismaModule,
     UsersModule,
     AuthModule,
     ProductModule,
-    CategoriesModule
+    CategoriesModule,
   ],
+  controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {} 
+export class AppModule {}
