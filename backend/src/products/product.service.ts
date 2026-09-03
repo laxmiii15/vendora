@@ -9,11 +9,15 @@ export class ProductService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getProducts(): Promise<Product[]> {
-    const products = await this.prisma.product.findMany();
+    const products = await this.prisma.product.findMany({
+      include: { category: true },
+    });
     return products;
   }
 
   async createProduct(createProductInput: CreateProductInput, user: User) {
+    await this.ensureCategoryExists(createProductInput.categoryId);
+
     const newProduct = await this.prisma.product.create({
       data: {
         name: createProductInput.name,
@@ -21,10 +25,12 @@ export class ProductService {
         price: createProductInput.price,
 
         sellerId: user.id,
+        categoryId: createProductInput.categoryId,
         slug: createProductInput.slug,
         status: createProductInput.status,
         stock: createProductInput.stock,
       },
+      include: { category: true },
     });
     return newProduct;
   }
@@ -43,12 +49,26 @@ export class ProductService {
       throw new NotFoundException('product  not found');
     }
 
+    if (updateProductInput.categoryId) {
+      await this.ensureCategoryExists(updateProductInput.categoryId);
+    }
+
     return this.prisma.product.update({
       where: {
         id,
       },
       data: updateProductInput,
+      include: { category: true },
     });
+  }
+
+  private async ensureCategoryExists(categoryId: string) {
+    const category = await this.prisma.category.findUnique({
+      where: { id: categoryId },
+    });
+    if (!category) {
+      throw new NotFoundException('category not found');
+    }
   }
 
   async deleteProduct(user: User, id: string) {

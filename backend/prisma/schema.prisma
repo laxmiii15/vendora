@@ -58,17 +58,23 @@ model Product {
   sellerId String
   seller   User   @relation(fields: [sellerId], references: [id])
 
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([sellerId])
   @@index([status])
+  @@index([categoryId])
 }
 
-model category {
+model Category {
   id        String   @id @default(cuid())
   name      String
   slug      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  products Product[]
 }

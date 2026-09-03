@@ -1,12 +1,13 @@
 services:
   postgres:
     image: postgres:17
+    container_name: vendora-db
     ports:
       - "5430:5432"
     environment:
       POSTGRES_USER: laxmii
       POSTGRES_PASSWORD: laxmi12
-      POSTGRES_DB: vendordb
+      POSTGRES_DB: vendoradb
     volumes:
       - postgres_data:/var/lib/postgresql/data
 volumes:

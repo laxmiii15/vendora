@@ -48,6 +48,10 @@ export class CreateProductInput {
   @Field(() => ProductStatus)
   @IsEnum(ProductStatus)
   status: ProductStatus;
+
+  @Field()
+  @IsString()
+  categoryId: string;
 }
 
 @InputType()

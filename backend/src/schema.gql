@@ -23,6 +23,14 @@ type AuthResponse {
   user: User!
 }
 
+type Category {
+  id: ID!
+  name: String!
+  slug: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Product {
   id: ID!
   name: String!
@@ -32,6 +40,8 @@ type Product {
   stock: Int!
   status: ProductStatus!
   sellerId: String!
+  categoryId: String!
+  category: Category
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -41,14 +51,6 @@ enum ProductStatus {
   ACTIVE
   OUT_OF_STOCK
   ARCHIVED
-}
-
-type Category {
-  id: ID!
-  name: String!
-  slug: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
 }
 
 type Query {
@@ -89,6 +91,7 @@ input CreateProductInput {
   stock: Int! = 0
   slug: String!
   status: ProductStatus!
+  categoryId: String!
 }
 
 input UpdateProductInput {
@@ -98,6 +101,7 @@ input UpdateProductInput {
   stock: Int = 0
   slug: String
   status: ProductStatus
+  categoryId: String
 }
 
 input CreateCategoryInput {
