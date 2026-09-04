@@ -28,6 +28,14 @@ enum ProductStatus {
   ARCHIVED
 }
 
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
 model User {
   id        String     @id @default(cuid())
   email     String     @unique
@@ -38,6 +46,7 @@ model User {
   status    UserStatus @default(ACTIVE)
 
   products Product[]
+  orders   Order[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -61,6 +70,8 @@ model Product {
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
 
+  orderItems OrderItem[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -77,4 +88,33 @@ model Category {
   updatedAt DateTime @updatedAt
 
   products Product[]
+}
+
+model Order {
+  id      String      @id @default(cuid())
+  buyerId String
+  buyer   User        @relation(fields: [buyerId], references: [id])
+  status  OrderStatus @default(PENDING)
+  total   Int
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([buyerId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  unitPrice Int
+
+  @@index([orderId])
+  @@index([productId])
 }
