@@ -92,8 +92,8 @@ model Category {
 
 model Order {
   id      String      @id @default(cuid())
-  buyerId String
-  buyer   User        @relation(fields: [buyerId], references: [id])
+  customerId String
+  customer   User        @relation(fields: [customerId], references: [id])
   status  OrderStatus @default(PENDING)
   total   Int
 
@@ -102,7 +102,7 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([buyerId])
+  @@index([customerId])
   @@index([status])
 }
 
