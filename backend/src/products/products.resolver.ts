@@ -15,7 +15,6 @@ export class ProductResolver {
   constructor(private readonly productService: ProductService) {}
 
   @Query(() => [Product])
-  @UseGuards(GqlJwtAuthGuard)
   getProducts(): Promise<Product[]> {
     return this.productService.getProducts();
   }

@@ -53,12 +53,45 @@ enum ProductStatus {
   ARCHIVED
 }
 
+type OrderItem {
+  id: ID!
+  orderId: String!
+  productId: String!
+  product: Product
+  quantity: Int!
+  unitPrice: Float!
+}
+
+type Order {
+  id: ID!
+  customerId: String!
+  status: OrderStatus!
+  total: Float!
+  items: [OrderItem!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+type CheckoutSession {
+  url: String!
+}
+
 type Query {
   me: User!
   users: [User!]!
   user(id: String!): User!
   getProducts: [Product!]!
   getCategories: [Category!]!
+  myOrders: [Order!]!
+  order(id: ID!): Order!
 }
 
 type Mutation {
@@ -70,6 +103,9 @@ type Mutation {
   createCategory(input: CreateCategoryInput!): Category!
   updateCategory(id: String!, input: UpdateCategoryInput!): Category!
   deleteCategory(id: String!): Category!
+  createOrder(input: CreateOrderInput!): Order!
+  updateOrderStatus(id: ID!, status: OrderStatus!): Order!
+  createCheckoutSession(orderId: ID!): CheckoutSession!
 }
 
 input RegisterInput {
@@ -112,4 +148,13 @@ input CreateCategoryInput {
 input UpdateCategoryInput {
   name: String!
   slug: String!
+}
+
+input CreateOrderInput {
+  items: [OrderItemInput!]!
+}
+
+input OrderItemInput {
+  productId: String!
+  quantity: Int!
 }

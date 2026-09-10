@@ -18,7 +18,6 @@ export class CategoriesResolver {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Query(() => [Category])
-  @UseGuards(GqlJwtAuthGuard)
   getCategories(): Promise<Category[]> {
     return this.categoriesService.getCategories();
   }
