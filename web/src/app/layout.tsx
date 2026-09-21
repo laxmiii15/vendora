@@ -1,30 +1,37 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, IBM_Plex_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
+  weight: ["500", "600", "700"],
+});
+
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
   title: "Vendora",
-  description: "A marketplace built on Vendora.",
+  description: "Women's fashion marketplace — dresses, jeans, and more in every size.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${jakarta.variable} ${cormorant.variable} ${plexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col font-sans">
         <Providers>{children}</Providers>
       </body>
     </html>

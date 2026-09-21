@@ -29,6 +29,8 @@ export class ProductService {
         slug: createProductInput.slug,
         status: createProductInput.status,
         stock: createProductInput.stock,
+        size: createProductInput.size,
+        imageUrl: createProductInput.imageUrl,
       },
       include: { category: true },
     });

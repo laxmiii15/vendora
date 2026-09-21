@@ -20,6 +20,8 @@ export const GET_PRODUCTS = gql`
       price
       stock
       status
+      size
+      imageUrl
       categoryId
       category {
         id

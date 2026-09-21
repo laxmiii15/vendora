@@ -28,6 +28,15 @@ enum ProductStatus {
   ARCHIVED
 }
 
+enum ProductSize {
+  XS
+  S
+  M
+  L
+  XL
+  XXL
+}
+
 enum OrderStatus {
   PENDING
   PAID
@@ -63,6 +72,8 @@ model Product {
   price       Int
   stock       Int           @default(0)
   status      ProductStatus @default(DRAFT)
+  size        ProductSize
+  imageUrl    String?
 
   sellerId String
   seller   User   @relation(fields: [sellerId], references: [id])
@@ -78,6 +89,7 @@ model Product {
   @@index([sellerId])
   @@index([status])
   @@index([categoryId])
+  @@index([size])
 }
 
 model Category {

@@ -1,9 +1,13 @@
 import { Field, ID, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { ProductStatus } from '../../generated/prisma/enums';
+import { ProductSize, ProductStatus } from '../../generated/prisma/enums';
 import { Category } from '../../categories/entities/category.entity';
 
 registerEnumType(ProductStatus, {
   name: 'ProductStautus',
+});
+
+registerEnumType(ProductSize, {
+  name: 'ProductSize',
 });
 
 @ObjectType()
@@ -28,6 +32,12 @@ export class Product {
 
   @Field(() => ProductStatus)
   status: ProductStatus;
+
+  @Field(() => ProductSize)
+  size: ProductSize;
+
+  @Field(() => String, { nullable: true })
+  imageUrl?: string | null;
 
   @Field()
   sellerId: string;

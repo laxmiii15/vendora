@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { CategoryStrip } from '@/components/category-strip';
 import { ErrorState } from '@/components/error-state';
 import { Header } from '@/components/header';
+import { Hero } from '@/components/hero';
 import { LoadingState } from '@/components/loading-state';
 import { ProductGrid } from '@/components/product-grid';
 import { GET_CATEGORIES, GET_PRODUCTS } from '@/graphql/queries';
@@ -34,27 +35,38 @@ export default function Home() {
       )
     : activeProducts;
 
+  const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
+
   return (
     <div className="flex flex-1 flex-col">
       <Header />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Shop everything.
-        </h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          Browse products across every category on Vendora.
-        </p>
-
+      <Hero />
+      <main id="shop" className="mx-auto w-full max-w-6xl flex-1 px-4 py-12">
         {loading && <LoadingState />}
         {error && <ErrorState message={error.message} />}
         {!loading && !error && (
           <>
-            <CategoryStrip
-              categories={categories}
-              selectedId={selectedCategoryId}
-              onSelect={setSelectedCategoryId}
-            />
-            <ProductGrid products={visibleProducts} />
+            <section>
+              <h2 className="font-display text-2xl font-semibold text-ink">
+                Shop by category
+              </h2>
+              <div className="mt-4">
+                <CategoryStrip
+                  categories={categories}
+                  selectedId={selectedCategoryId}
+                  onSelect={setSelectedCategoryId}
+                />
+              </div>
+            </section>
+
+            <section className="mt-12">
+              <h2 className="font-display text-2xl font-semibold text-ink">
+                {selectedCategory ? selectedCategory.name : 'All products'}
+              </h2>
+              <div className="mt-4">
+                <ProductGrid products={visibleProducts} />
+              </div>
+            </section>
           </>
         )}
       </main>

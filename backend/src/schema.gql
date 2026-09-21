@@ -39,6 +39,8 @@ type Product {
   price: Float!
   stock: Int!
   status: ProductStatus!
+  size: ProductSize!
+  imageUrl: String
   sellerId: String!
   categoryId: String!
   category: Category
@@ -51,6 +53,15 @@ enum ProductStatus {
   ACTIVE
   OUT_OF_STOCK
   ARCHIVED
+}
+
+enum ProductSize {
+  XS
+  S
+  M
+  L
+  XL
+  XXL
 }
 
 type OrderItem {
@@ -127,6 +138,8 @@ input CreateProductInput {
   stock: Int! = 0
   slug: String!
   status: ProductStatus!
+  size: ProductSize!
+  imageUrl: String
   categoryId: String!
 }
 
@@ -137,6 +150,8 @@ input UpdateProductInput {
   stock: Int = 0
   slug: String
   status: ProductStatus
+  size: ProductSize
+  imageUrl: String
   categoryId: String
 }
 

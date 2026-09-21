@@ -13,10 +13,14 @@ import {
   IsOptional,
   IsEnum,
 } from 'class-validator';
-import { ProductStatus } from 'src/generated/prisma/enums';
+import { ProductSize, ProductStatus } from 'src/generated/prisma/enums';
 
 registerEnumType(ProductStatus, {
   name: 'ProductStatus',
+});
+
+registerEnumType(ProductSize, {
+  name: 'ProductSize',
 });
 
 @InputType()
@@ -48,6 +52,15 @@ export class CreateProductInput {
   @Field(() => ProductStatus)
   @IsEnum(ProductStatus)
   status: ProductStatus;
+
+  @Field(() => ProductSize)
+  @IsEnum(ProductSize)
+  size: ProductSize;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 
   @Field()
   @IsString()
