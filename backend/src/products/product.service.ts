@@ -15,6 +15,17 @@ export class ProductService {
     return products;
   }
 
+  async getProductBySlug(slug: string): Promise<Product> {
+    const product = await this.prisma.product.findUnique({
+      where: { slug },
+      include: { category: true },
+    });
+    if (!product) {
+      throw new NotFoundException('product not found');
+    }
+    return product;
+  }
+
   async createProduct(createProductInput: CreateProductInput, user: User) {
     await this.ensureCategoryExists(createProductInput.categoryId);
 

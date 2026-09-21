@@ -56,3 +56,61 @@ export interface GetCategoriesData {
 export interface GetProductsData {
   getProducts: Product[];
 }
+
+export interface GetProductBySlugData {
+  productBySlug: Product;
+}
+
+export type OrderStatus =
+  | 'PENDING'
+  | 'PAID'
+  | 'SHIPPED'
+  | 'DELIVERED'
+  | 'CANCELLED';
+
+export interface OrderItem {
+  id: string;
+  productId: string;
+  product: Product | null;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface Order {
+  id: string;
+  customerId: string;
+  status: OrderStatus;
+  total: number;
+  items: OrderItem[] | null;
+  createdAt: string;
+}
+
+export interface CreateOrderData {
+  createOrder: Order;
+}
+
+export interface CreateCheckoutSessionData {
+  createCheckoutSession: { url: string };
+}
+
+export interface MyOrdersData {
+  myOrders: Order[];
+}
+
+export interface OrderData {
+  order: Order;
+}
+
+// A cart line stores a snapshot of the product at add-to-cart time (name,
+// price, image) so the cart page can render without re-fetching — the
+// authoritative price is always re-read server-side when the order is
+// actually created, this snapshot is display-only.
+export interface CartItem {
+  productId: string;
+  name: string;
+  price: number;
+  imageUrl: string | null;
+  size: ProductSize;
+  categoryId: string;
+  quantity: number;
+}

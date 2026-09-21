@@ -21,7 +21,7 @@ export function Hero() {
         <div className="mt-8">
           <a
             href="#shop"
-            className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-ink transition-colors hover:bg-white/90"
+            className="inline-flex items-center gap-2 rounded-full bg-brand px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-hover"
           >
             Shop now
             <span aria-hidden="true">&rarr;</span>

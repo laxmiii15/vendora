@@ -19,6 +19,11 @@ export class ProductResolver {
     return this.productService.getProducts();
   }
 
+  @Query(() => Product, { name: 'productBySlug' })
+  getProductBySlug(@Args('slug') slug: string): Promise<Product> {
+    return this.productService.getProductBySlug(slug);
+  }
+
   @Mutation(() => Product)
   @UseGuards(GqlJwtAuthGuard, RolesGuard)
   @Roles(UserRole.SELLER, UserRole.ADMIN, UserRole.SUPER_ADMIN)

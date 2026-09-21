@@ -16,6 +16,24 @@ export const LOGIN = gql`
   }
 `;
 
+export const CREATE_ORDER = gql`
+  mutation CreateOrder($items: [OrderItemInput!]!) {
+    createOrder(input: { items: $items }) {
+      id
+      status
+      total
+    }
+  }
+`;
+
+export const CREATE_CHECKOUT_SESSION = gql`
+  mutation CreateCheckoutSession($orderId: ID!) {
+    createCheckoutSession(orderId: $orderId) {
+      url
+    }
+  }
+`;
+
 export const REGISTER = gql`
   mutation Register(
     $email: String!
