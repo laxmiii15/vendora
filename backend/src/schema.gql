@@ -100,6 +100,7 @@ type Query {
   users: [User!]!
   user(id: String!): User!
   getProducts: [Product!]!
+  productBySlug(slug: String!): Product!
   getCategories: [Category!]!
   myOrders: [Order!]!
   order(id: ID!): Order!

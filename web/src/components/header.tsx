@@ -11,7 +11,7 @@ function CartIcon() {
   return (
     <Link
       href="/cart"
-      className="relative flex items-center text-ink-muted transition-colors hover:text-ink"
+      className="relative flex h-10 w-10 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
       aria-label="Cart"
     >
       <svg
@@ -20,7 +20,7 @@ function CartIcon() {
         fill="none"
         stroke="currentColor"
         strokeWidth={1.8}
-        className="h-6 w-6"
+        className="h-5.5 w-5.5"
       >
         <path
           strokeLinecap="round"
@@ -31,7 +31,7 @@ function CartIcon() {
         <circle cx="17" cy="20" r="1.3" fill="currentColor" stroke="none" />
       </svg>
       {totalCount > 0 && (
-        <span className="absolute -top-2 -right-2 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white">
+        <span className="absolute top-0.5 right-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white ring-2 ring-surface">
           {totalCount}
         </span>
       )}
@@ -40,7 +40,15 @@ function CartIcon() {
 }
 
 function NavDivider() {
-  return <span className="h-5 w-px bg-rule" aria-hidden="true" />;
+  return <span className="h-6 w-px bg-rule" aria-hidden="true" />;
+}
+
+function Avatar({ label }: { label: string }) {
+  return (
+    <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-brand-soft text-sm font-semibold text-brand-ink">
+      {label.charAt(0).toUpperCase()}
+    </span>
+  );
 }
 
 export function Header() {
@@ -53,34 +61,37 @@ export function Header() {
   }
 
   return (
-    <header className="border-b border-rule bg-surface">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
-        <Link
-          href="/"
-          className="font-display text-2xl font-semibold tracking-wide text-brand-ink"
-        >
-          Vendora
+    <header className="sticky top-0 z-20 border-b border-rule bg-surface shadow-sm">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+        <Link href="/" className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand font-display text-base font-semibold text-white">
+            V
+          </span>
+          <span className="font-display text-2xl font-semibold tracking-wide text-ink">
+            Vendora
+          </span>
         </Link>
 
-        <nav className="flex items-center gap-5">
+        <nav className="flex items-center gap-4">
           <CartIcon />
           <NavDivider />
 
           {user ? (
-            <div className="flex items-center gap-5">
-              <span className="text-sm text-ink-muted">
-                Hi, {user.firstName ?? user.email}
+            <div className="flex items-center gap-3">
+              <Avatar label={user.firstName ?? user.email} />
+              <span className="hidden text-sm font-medium text-ink sm:inline">
+                {user.firstName ?? user.email}
               </span>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="text-sm font-medium text-ink-muted transition-colors hover:text-ink"
+                className="ml-1 text-sm font-medium text-ink-muted transition-colors hover:text-ink"
               >
                 Log out
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-4">
               <Link
                 href="/login"
                 className="text-sm font-medium text-ink-muted transition-colors hover:text-ink"
