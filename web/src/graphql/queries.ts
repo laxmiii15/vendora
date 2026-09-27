@@ -11,8 +11,8 @@ export const GET_CATEGORIES = gql`
 `;
 
 export const GET_PRODUCTS = gql`
-  query GetProducts {
-    getProducts {
+  query GetProducts($search: String) {
+    getProducts(search: $search) {
       id
       name
       slug

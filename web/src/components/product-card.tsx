@@ -30,26 +30,26 @@ export function ProductCard({ product }: { product: Product }) {
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-rule bg-surface p-4 shadow-sm">
+    <div className="flex flex-col gap-3 bg-surface">
       <Link href={`/products/${product.slug}`} className="flex flex-col gap-3">
-        <div className="relative aspect-square overflow-hidden rounded-xl">
+        <div className="relative aspect-square overflow-hidden bg-[#f5f5f5]">
           {product.imageUrl ? (
             <Image
               src={product.imageUrl}
               alt={product.name}
               fill
               sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-              className="object-cover"
+              className="object-contain p-4"
             />
           ) : (
             <div
-              className={`flex h-full w-full items-center justify-center text-2xl font-semibold text-white ${color.tile}`}
+              className={`flex h-full w-full items-center justify-center text-2xl font-semibold text-ink-muted ${color.tile}`}
             >
               {initials}
             </div>
           )}
           {isOutOfStock && (
-            <span className="absolute top-2 left-2 rounded-full bg-ink/80 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase">
+            <span className="absolute top-2 left-2 rounded-full bg-ink/80 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-surface uppercase">
               Out of stock
             </span>
           )}

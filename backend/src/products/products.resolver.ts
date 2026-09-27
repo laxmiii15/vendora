@@ -15,8 +15,10 @@ export class ProductResolver {
   constructor(private readonly productService: ProductService) {}
 
   @Query(() => [Product])
-  getProducts(): Promise<Product[]> {
-    return this.productService.getProducts();
+  getProducts(
+    @Args('search', { type: () => String, nullable: true }) search?: string,
+  ): Promise<Product[]> {
+    return this.productService.getProducts(search);
   }
 
   @Query(() => Product, { name: 'productBySlug' })

@@ -1,7 +1,8 @@
 'use client';
 
 import { useQuery } from '@apollo/client/react';
-import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useState } from 'react';
 import { CategoryStrip } from '@/components/category-strip';
 import { ErrorState } from '@/components/error-state';
 import { Header } from '@/components/header';
@@ -12,12 +13,33 @@ import { GET_CATEGORIES, GET_PRODUCTS } from '@/graphql/queries';
 import type { GetCategoriesData, GetProductsData } from '@/lib/types';
 
 export default function Home() {
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
-    null,
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
   );
+}
+
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get('category');
+  const searchTerm = searchParams.get('q')?.trim() || null;
+  // Local selection overrides the header's `?category=` link until the URL changes.
+  const [selection, setSelection] = useState<{
+    param: string | null;
+    id: string | null;
+  } | null>(null);
+  const selectedCategoryId =
+    selection && selection.param === categoryParam
+      ? selection.id
+      : categoryParam;
+  const setSelectedCategoryId = (id: string | null) =>
+    setSelection({ param: categoryParam, id });
 
   const categoriesResult = useQuery<GetCategoriesData>(GET_CATEGORIES);
-  const productsResult = useQuery<GetProductsData>(GET_PRODUCTS);
+  const productsResult = useQuery<GetProductsData>(GET_PRODUCTS, {
+    variables: { search: searchTerm },
+  });
 
   const loading = categoriesResult.loading || productsResult.loading;
   const error = categoriesResult.error ?? productsResult.error;
@@ -61,7 +83,11 @@ export default function Home() {
 
             <section className="mt-12">
               <h2 className="font-display text-2xl font-semibold text-ink">
-                {selectedCategory ? selectedCategory.name : 'All products'}
+                {searchTerm
+                  ? `Results for "${searchTerm}"`
+                  : selectedCategory
+                    ? selectedCategory.name
+                    : 'All products'}
               </h2>
               <div className="mt-4">
                 <ProductGrid products={visibleProducts} />

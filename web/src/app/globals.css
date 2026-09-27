@@ -1,19 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --brand: #b0596e;
-  --brand-hover: #8f4357;
-  --brand-soft: #f8e8ec;
-  --brand-ink: #6e2e40;
+  --brand: #000000;
+  --brand-hover: #212121;
+  --brand-soft: #f5f5f5;
+  --brand-ink: #000000;
+  --on-brand: #ffffff;
 
-  --paper: #fdf6f4;
+  --paper: #ffffff;
   --surface: #ffffff;
-  --surface-sunken: #fbeeec;
-  --ink: #3d2b2e;
-  --ink-muted: #8b6f73;
-  --ink-faint: #b79ba0;
-  --rule: #f0dee1;
-  --rule-strong: #e3c6cc;
+  --surface-sunken: #f5f5f5;
+  --ink: #000000;
+  --ink-muted: #6b6b6b;
+  --ink-faint: #a3a3a3;
+  --rule: #e0e0e0;
+  --rule-strong: #c9c9c9;
 
   --success: #6b8f71;
   --success-soft: #e9f1ea;
@@ -22,8 +23,8 @@
   --warning: #b98b3e;
   --warning-soft: #fbf1dc;
 
-  --shadow-sm: 0 1px 3px rgba(110, 46, 64, 0.08);
-  --shadow-md: 0 6px 20px rgba(110, 46, 64, 0.1);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
 @theme inline {
@@ -31,6 +32,7 @@
   --color-brand-hover: var(--brand-hover);
   --color-brand-soft: var(--brand-soft);
   --color-brand-ink: var(--brand-ink);
+  --color-on-brand: var(--on-brand);
   --color-paper: var(--paper);
   --color-surface: var(--surface);
   --color-surface-sunken: var(--surface-sunken);
@@ -50,48 +52,21 @@
   --font-display: var(--font-cormorant);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --brand: #e08ba0;
-    --brand-hover: #eaa5b6;
-    --brand-soft: #3a2229;
-    --brand-ink: #f3c3ce;
-
-    --paper: #241a1c;
-    --surface: #2e2225;
-    --surface-sunken: #362729;
-    --ink: #f3e6e8;
-    --ink-muted: #c7a8ad;
-    --ink-faint: #8b6f73;
-    --rule: #4a3236;
-    --rule-strong: #5c3e43;
-
-    --success: #8fb897;
-    --success-soft: #24312a;
-    --danger: #e08a82;
-    --danger-soft: #3a211f;
-    --warning: #e0b368;
-    --warning-soft: #362a14;
-
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
-  }
-}
-
 :root[data-theme="dark"] {
-  --brand: #e08ba0;
-  --brand-hover: #eaa5b6;
-  --brand-soft: #3a2229;
-  --brand-ink: #f3c3ce;
+  --brand: #ffffff;
+  --brand-hover: #d9d9d9;
+  --brand-soft: #1f1f1f;
+  --brand-ink: #ffffff;
+  --on-brand: #000000;
 
-  --paper: #241a1c;
-  --surface: #2e2225;
-  --surface-sunken: #362729;
-  --ink: #f3e6e8;
-  --ink-muted: #c7a8ad;
-  --ink-faint: #8b6f73;
-  --rule: #4a3236;
-  --rule-strong: #5c3e43;
+  --paper: #0a0a0a;
+  --surface: #111111;
+  --surface-sunken: #1a1a1a;
+  --ink: #f5f5f5;
+  --ink-muted: #a3a3a3;
+  --ink-faint: #7f7f7f;
+  --rule: #2e2e2e;
+  --rule-strong: #444444;
 
   --success: #8fb897;
   --success-soft: #24312a;

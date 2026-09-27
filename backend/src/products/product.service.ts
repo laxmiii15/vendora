@@ -8,8 +8,17 @@ import { User } from 'src/users/entities/user.entity';
 export class ProductService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getProducts(): Promise<Product[]> {
+  async getProducts(search?: string): Promise<Product[]> {
+    const trimmed = search?.trim();
     const products = await this.prisma.product.findMany({
+      where: trimmed
+        ? {
+            OR: [
+              { name: { contains: trimmed, mode: 'insensitive' } },
+              { description: { contains: trimmed, mode: 'insensitive' } },
+            ],
+          }
+        : undefined,
       include: { category: true },
     });
     return products;

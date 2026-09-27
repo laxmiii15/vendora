@@ -59,25 +59,25 @@ export default function ProductDetailPage() {
             </Link>
 
             <div className="mt-6 grid gap-10 sm:grid-cols-2">
-              <div className="relative aspect-square overflow-hidden rounded-2xl">
+              <div className="relative aspect-square overflow-hidden bg-[#f5f5f5]">
                 {product.imageUrl ? (
                   <Image
                     src={product.imageUrl}
                     alt={product.name}
                     fill
                     sizes="(min-width: 640px) 50vw, 100vw"
-                    className="object-cover"
+                    className="object-contain p-6"
                     priority
                   />
                 ) : (
                   <div
-                    className={`flex h-full w-full items-center justify-center text-5xl font-semibold text-white ${categoryColor(product.categoryId).tile}`}
+                    className={`flex h-full w-full items-center justify-center text-5xl font-semibold text-ink-muted ${categoryColor(product.categoryId).tile}`}
                   >
                     {product.name.slice(0, 2).toUpperCase()}
                   </div>
                 )}
                 {isOutOfStock && (
-                  <span className="absolute top-3 left-3 rounded-full bg-ink/80 px-3 py-1 text-xs font-semibold tracking-wide text-white uppercase">
+                  <span className="absolute top-3 left-3 rounded-full bg-ink/80 px-3 py-1 text-xs font-semibold tracking-wide text-surface uppercase">
                     Out of stock
                   </span>
                 )}
