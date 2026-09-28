@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UserStatus } from '../../generated/prisma/enums';
 import { UsersService } from '../../users/users.service';
 
 interface JwtPayload {
@@ -30,7 +31,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   // Runs ONLY after Passport has verified the signature and expiry.
   async validate(payload: JwtPayload) {
     const user = await this.usersService.findById(payload.sub);
-    if (!user) {
+    // Re-checked on every request so a ban takes effect immediately, not
+    // only once the user's current token expires.
+    if (!user || user.status === UserStatus.BANNED) {
       throw new UnauthorizedException();
     }
 

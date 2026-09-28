@@ -6,6 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { UserStatus } from '../generated/prisma/enums';
 import { UsersService } from '../users/users.service';
 import { LoginInput } from './dto/login.input';
 import { RegisterInput } from './dto/register.input';
@@ -64,6 +65,12 @@ export class AuthService {
 
     if (!user || !user.password || !passwordValid) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Checked only after the password, so a ban isn't revealed to someone
+    // who doesn't know the credentials.
+    if (user.status === UserStatus.BANNED) {
+      throw new UnauthorizedException('This account has been suspended');
     }
 
     const { password: _password, ...safeUser } = user;

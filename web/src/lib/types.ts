@@ -114,3 +114,50 @@ export interface CartItem {
   categoryId: string;
   quantity: number;
 }
+
+// ---- Admin panel ----
+
+export interface Paginated<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface AdminUser extends User {
+  createdAt: string;
+}
+
+export interface AdminOrder extends Omit<Order, 'customerId'> {
+  customer: Pick<User, 'id' | 'email' | 'firstName' | 'lastName'> | null;
+}
+
+export interface AdminProduct extends Omit<Product, 'category'> {
+  category: Pick<Category, 'id' | 'name'> | null;
+  createdAt: string;
+}
+
+export interface AdminStats {
+  revenue: number;
+  orderCount: number;
+  pendingOrderCount: number;
+  customerCount: number;
+  activeProductCount: number;
+  lowStockCount: number;
+}
+
+export interface AdminStatsData {
+  adminStats: AdminStats;
+}
+
+export interface AdminOrdersData {
+  adminOrders: Paginated<AdminOrder>;
+}
+
+export interface AdminProductsData {
+  adminProducts: Paginated<AdminProduct>;
+}
+
+export interface AdminUsersData {
+  adminUsers: Paginated<AdminUser>;
+}

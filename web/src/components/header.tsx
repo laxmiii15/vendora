@@ -209,6 +209,16 @@ function AccountMenu() {
           <p className="truncate px-4 pb-2 text-xs text-ink-muted">
             {user.firstName ?? user.email}
           </p>
+          {(user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') && (
+            <Link
+              href="/admin"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="block w-full px-4 py-2 text-left text-sm text-ink transition-colors hover:bg-surface-sunken"
+            >
+              Admin panel
+            </Link>
+          )}
           <button
             type="button"
             role="menuitem"

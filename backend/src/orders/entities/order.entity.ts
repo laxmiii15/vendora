@@ -1,5 +1,6 @@
 import { Field, ID, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { OrderStatus } from '../../generated/prisma/enums';
+import { User } from '../../users/entities/user.entity';
 import { OrderItem } from './order-item.entity';
 
 registerEnumType(OrderStatus, {
@@ -13,6 +14,10 @@ export class Order {
 
   @Field()
   customerId: string;
+
+  // Only populated by queries that include it (e.g. adminOrders).
+  @Field(() => User, { nullable: true })
+  customer?: User;
 
   @Field(() => OrderStatus)
   status: OrderStatus;

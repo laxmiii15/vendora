@@ -76,6 +76,7 @@ type OrderItem {
 type Order {
   id: ID!
   customerId: String!
+  customer: User
   status: OrderStatus!
   total: Float!
   items: [OrderItem!]
@@ -95,15 +96,62 @@ type CheckoutSession {
   url: String!
 }
 
+type OrderPage {
+  items: [Order!]!
+  total: Int!
+  page: Int!
+  pageSize: Int!
+}
+
+type ProductPage {
+  items: [Product!]!
+  total: Int!
+  page: Int!
+  pageSize: Int!
+}
+
+type UserPage {
+  items: [User!]!
+  total: Int!
+  page: Int!
+  pageSize: Int!
+}
+
+type AdminStats {
+  revenue: Float!
+  orderCount: Int!
+  pendingOrderCount: Int!
+  customerCount: Int!
+  activeProductCount: Int!
+  lowStockCount: Int!
+}
+
 type Query {
   me: User!
   users: [User!]!
   user(id: String!): User!
-  getProducts: [Product!]!
+  getProducts(search: String): [Product!]!
   productBySlug(slug: String!): Product!
   getCategories: [Category!]!
   myOrders: [Order!]!
   order(id: ID!): Order!
+  adminStats: AdminStats!
+  adminOrders(page: Int! = 1, pageSize: Int! = 20, search: String, status: OrderStatus): OrderPage!
+  adminProducts(page: Int! = 1, pageSize: Int! = 20, search: String, status: ProductStatus): ProductPage!
+  adminUsers(page: Int! = 1, pageSize: Int! = 20, search: String, role: UserRole, status: UserStatus): UserPage!
+}
+
+enum UserRole {
+  CUSTOMER
+  SELLER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  BANNED
+  PENDING_VERIFICATION
 }
 
 type Mutation {
@@ -118,6 +166,8 @@ type Mutation {
   createOrder(input: CreateOrderInput!): Order!
   updateOrderStatus(id: ID!, status: OrderStatus!): Order!
   createCheckoutSession(orderId: ID!): CheckoutSession!
+  updateUserRole(id: ID!, role: UserRole!): User!
+  updateUserStatus(id: ID!, status: UserStatus!): User!
 }
 
 input RegisterInput {
