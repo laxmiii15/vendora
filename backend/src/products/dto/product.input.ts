@@ -35,7 +35,7 @@ export class CreateProductInput {
   @IsString()
   description?: string;
 
-  @Field()
+  @Field(() => Int)
   @IsInt()
   @Min(0)
   price: number;
@@ -68,4 +68,12 @@ export class CreateProductInput {
 }
 
 @InputType()
-export class UpdateProductInput extends PartialType(CreateProductInput) {}
+export class UpdateProductInput extends PartialType(CreateProductInput) {
+  // Redeclared without the create input's defaultValue: 0, which PartialType
+  // would otherwise copy — an update that omits stock must leave it untouched.
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  stock?: number;
+}

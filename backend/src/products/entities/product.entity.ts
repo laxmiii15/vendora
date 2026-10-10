@@ -24,7 +24,7 @@ export class Product {
   @Field(() => String, { nullable: true })
   description?: string | null;
 
-  @Field()
+  @Field(() => Int)
   price: number;
 
   @Field(() => Int)

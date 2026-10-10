@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -14,6 +15,15 @@ import {
 } from '../generated/prisma/enums';
 
 const ORDER_INCLUDE = { items: { include: { product: true } } } as const;
+
+// Paid orders can't be cancelled yet — that needs a Stripe refund first.
+const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  [OrderStatus.PENDING]: [OrderStatus.PAID, OrderStatus.CANCELLED],
+  [OrderStatus.PAID]: [OrderStatus.SHIPPED],
+  [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED],
+  [OrderStatus.DELIVERED]: [],
+  [OrderStatus.CANCELLED]: [],
+};
 
 @Injectable()
 export class OrdersService {
@@ -108,16 +118,82 @@ export class OrdersService {
   }
 
   async updateOrderStatus(id: string, status: OrderStatus) {
+    if (status === OrderStatus.CANCELLED) {
+      return this.cancelOrder(id);
+    }
+
     const order = await this.prisma.order.findUnique({ where: { id } });
 
     if (!order) {
       throw new NotFoundException('Order not found');
     }
 
-    return this.prisma.order.update({
-      where: { id },
+    this.assertTransitionAllowed(order.status, status);
+
+    // Conditional on the status we just read: if another request changed it in
+    // between, count is 0 and we reject instead of overwriting their change.
+    const updated = await this.prisma.order.updateMany({
+      where: { id, status: order.status },
       data: { status },
+    });
+
+    if (updated.count === 0) {
+      throw new ConflictException(
+        'Order status changed concurrently, please retry',
+      );
+    }
+
+    return this.prisma.order.findUniqueOrThrow({
+      where: { id },
       include: ORDER_INCLUDE,
     });
+  }
+
+  // Cancels a PENDING order and returns its reserved stock. Kept separate from
+  // updateOrderStatus so the Stripe webhook can call it for expired checkouts.
+  async cancelOrder(id: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id },
+        include: { items: true },
+      });
+
+      if (!order) {
+        throw new NotFoundException('Order not found');
+      }
+
+      this.assertTransitionAllowed(order.status, OrderStatus.CANCELLED);
+
+      // Only one concurrent cancel can flip PENDING -> CANCELLED, so stock is
+      // restored exactly once.
+      const cancelled = await tx.order.updateMany({
+        where: { id, status: OrderStatus.PENDING },
+        data: { status: OrderStatus.CANCELLED },
+      });
+
+      if (cancelled.count === 0) {
+        throw new ConflictException('Order is no longer pending');
+      }
+
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { increment: item.quantity } },
+        });
+      }
+
+      return tx.order.findUniqueOrThrow({
+        where: { id },
+        include: ORDER_INCLUDE,
+      });
+    });
+  }
+
+  private assertTransitionAllowed(from: OrderStatus, to: OrderStatus) {
+    if (!ALLOWED_TRANSITIONS[from].includes(to)) {
+      throw new BadRequestException(
+        `Cannot change order status from ${from} to ${to}`,
+      );
+    }
   }
 }

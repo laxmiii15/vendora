@@ -18,6 +18,6 @@ export class OrderItem {
   @Field(() => Int)
   quantity: number;
 
-  @Field()
+  @Field(() => Int)
   unitPrice: number;
 }

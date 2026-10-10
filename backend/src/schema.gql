@@ -36,7 +36,7 @@ type Product {
   name: String!
   slug: String!
   description: String
-  price: Float!
+  price: Int!
   stock: Int!
   status: ProductStatus!
   size: ProductSize!
@@ -70,7 +70,7 @@ type OrderItem {
   productId: String!
   product: Product
   quantity: Int!
-  unitPrice: Float!
+  unitPrice: Int!
 }
 
 type Order {
@@ -78,7 +78,7 @@ type Order {
   customerId: String!
   customer: User
   status: OrderStatus!
-  total: Float!
+  total: Int!
   items: [OrderItem!]
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -185,7 +185,7 @@ input LoginInput {
 input CreateProductInput {
   name: String!
   description: String
-  price: Float!
+  price: Int!
   stock: Int! = 0
   slug: String!
   status: ProductStatus!
@@ -197,8 +197,8 @@ input CreateProductInput {
 input UpdateProductInput {
   name: String
   description: String
-  price: Float
-  stock: Int = 0
+  price: Int
+  stock: Int
   slug: String
   status: ProductStatus
   size: ProductSize

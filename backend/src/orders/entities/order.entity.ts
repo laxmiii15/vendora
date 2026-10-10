@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, ID, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { OrderStatus } from '../../generated/prisma/enums';
 import { User } from '../../users/entities/user.entity';
 import { OrderItem } from './order-item.entity';
@@ -22,7 +22,7 @@ export class Order {
   @Field(() => OrderStatus)
   status: OrderStatus;
 
-  @Field()
+  @Field(() => Int)
   total: number;
 
   @Field(() => [OrderItem], { nullable: true })
