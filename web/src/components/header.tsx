@@ -209,6 +209,26 @@ function AccountMenu() {
           <p className="truncate px-4 pb-2 text-xs text-ink-muted">
             {user.firstName ?? user.email}
           </p>
+          <Link
+            href="/orders"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="block w-full px-4 py-2 text-left text-sm text-ink transition-colors hover:bg-surface-sunken"
+          >
+            My orders
+          </Link>
+          {(user.role === 'SELLER' ||
+            user.role === 'ADMIN' ||
+            user.role === 'SUPER_ADMIN') && (
+            <Link
+              href="/seller"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="block w-full px-4 py-2 text-left text-sm text-ink transition-colors hover:bg-surface-sunken"
+            >
+              Seller dashboard
+            </Link>
+          )}
           {(user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') && (
             <Link
               href="/admin"

@@ -15,9 +15,14 @@ export default function CheckoutSuccessPage() {
           your order status will update automatically once it&apos;s
           processed.
         </p>
-        <Link href="/" className="mt-8">
-          <Button>Continue shopping</Button>
-        </Link>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link href="/orders">
+            <Button variant="secondary">View my orders</Button>
+          </Link>
+          <Link href="/">
+            <Button>Continue shopping</Button>
+          </Link>
+        </div>
       </main>
     </div>
   );

@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-const ADMIN_PRODUCT_FIELDS = `
+export const ADMIN_PRODUCT_FIELDS = `
   id
   name
   slug

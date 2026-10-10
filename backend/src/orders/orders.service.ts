@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { PageArgs } from '../common/paginated';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderInput } from './dto/order.input';
 import { User } from '../users/entities/user.entity';
@@ -85,12 +86,33 @@ export class OrdersService {
     });
   }
 
-  async findMyOrders(customer: User) {
-    return this.prisma.order.findMany({
-      where: { customerId: customer.id },
-      include: ORDER_INCLUDE,
-      orderBy: { createdAt: 'desc' },
-    });
+  async findMyOrders(customer: User, { page, pageSize }: PageArgs) {
+    const where = { customerId: customer.id };
+
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.order.findMany({
+        where,
+        include: ORDER_INCLUDE,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return { items, total, page, pageSize };
+  }
+
+  async cancelMyOrder(id: string, customer: User) {
+    const order = await this.prisma.order.findUnique({ where: { id } });
+
+    // Same 404 for "doesn't exist" and "not yours" so customers can't probe
+    // other people's order ids.
+    if (!order || order.customerId !== customer.id) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return this.cancelOrder(id);
   }
 
   async findOrderById(id: string, requester: User) {

@@ -12,12 +12,8 @@ import {
   AdminProductsArgs,
   AdminUsersArgs,
 } from './dto/admin.args';
-import {
-  AdminStats,
-  OrderPage,
-  ProductPage,
-  UserPage,
-} from './entities/admin.entities';
+import { OrderPage } from '../orders/entities/order.entity';
+import { AdminStats, ProductPage, UserPage } from './entities/admin.entities';
 
 // Guards are applied at class level so every admin operation, including ones
 // added later, is admin-only by default.

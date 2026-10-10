@@ -6,6 +6,7 @@ import { Request } from 'express';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { formatGraphqlError } from './common/format-graphql-error';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -14,6 +15,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { OrdersModule } from './orders/orders.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AdminModule } from './admin/admin.module';
+import { SellerModule } from './seller/seller.module';
 
 @Module({
   imports: [
@@ -26,6 +28,9 @@ import { AdminModule } from './admin/admin.module';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       playground: true,
       context: ({ req }: { req: Request }) => ({ req }),
+      formatError: formatGraphqlError,
+      // Stack traces reveal file paths and internals; keep them for local dev.
+      includeStacktraceInErrorResponses: process.env.NODE_ENV !== 'production',
     }),
 
     PrismaModule,
@@ -36,6 +41,7 @@ import { AdminModule } from './admin/admin.module';
     OrdersModule,
     PaymentsModule,
     AdminModule,
+    SellerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

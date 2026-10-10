@@ -94,7 +94,11 @@ export interface CreateCheckoutSessionData {
 }
 
 export interface MyOrdersData {
-  myOrders: Order[];
+  myOrders: Paginated<Order>;
+}
+
+export interface CancelMyOrderData {
+  cancelMyOrder: Pick<Order, 'id' | 'status'>;
 }
 
 export interface OrderData {
@@ -160,4 +164,35 @@ export interface AdminProductsData {
 
 export interface AdminUsersData {
   adminUsers: Paginated<AdminUser>;
+}
+
+// ---- Seller dashboard ----
+
+export interface SellerStats {
+  revenue: number;
+  orderCount: number;
+  awaitingShipmentCount: number;
+  activeProductCount: number;
+  lowStockCount: number;
+}
+
+// Only the seller's own lines of the order; `subtotal` covers just those.
+export interface SellerOrder {
+  id: string;
+  status: OrderStatus;
+  subtotal: number;
+  createdAt: string;
+  items: OrderItem[];
+}
+
+export interface SellerStatsData {
+  sellerStats: SellerStats;
+}
+
+export interface SellerProductsData {
+  sellerProducts: Paginated<AdminProduct>;
+}
+
+export interface SellerOrdersData {
+  sellerOrders: Paginated<SellerOrder>;
 }

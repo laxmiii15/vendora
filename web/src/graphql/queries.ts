@@ -75,9 +75,14 @@ const ORDER_FIELDS = `
 `;
 
 export const GET_MY_ORDERS = gql`
-  query GetMyOrders {
-    myOrders {
-      ${ORDER_FIELDS}
+  query GetMyOrders($page: Int!, $pageSize: Int!) {
+    myOrders(page: $page, pageSize: $pageSize) {
+      items {
+        ${ORDER_FIELDS}
+      }
+      total
+      page
+      pageSize
     }
   }
 `;

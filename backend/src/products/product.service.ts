@@ -1,8 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Product } from './entities/product.entity';
 import { CreateProductInput, UpdateProductInput } from './dto/product.input';
 import { User } from 'src/users/entities/user.entity';
+import { UserRole } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class ProductService {
@@ -71,6 +76,8 @@ export class ProductService {
       throw new NotFoundException('product  not found');
     }
 
+    this.assertCanManage(product, user);
+
     if (updateProductInput.categoryId) {
       await this.ensureCategoryExists(updateProductInput.categoryId);
     }
@@ -82,6 +89,16 @@ export class ProductService {
       data: updateProductInput,
       include: { category: true },
     });
+  }
+
+  // Sellers may only manage their own listings; admins may manage any.
+  private assertCanManage(product: { sellerId: string }, user: User) {
+    const isAdmin =
+      user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN;
+
+    if (!isAdmin && product.sellerId !== user.id) {
+      throw new ForbiddenException('You can only manage your own products');
+    }
   }
 
   private async ensureCategoryExists(categoryId: string) {
@@ -102,6 +119,8 @@ export class ProductService {
     if (!product) {
       throw new NotFoundException('product not found');
     }
+
+    this.assertCanManage(product, user);
 
     return this.prisma.product.delete({
       where: {

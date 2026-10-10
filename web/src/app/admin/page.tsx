@@ -6,6 +6,7 @@ import {
   Badge,
   EmptyRow,
   PageHeader,
+  StatCard,
   formatDate,
   formatLabel,
   statusTone,
@@ -16,32 +17,6 @@ import { LoadingState } from '@/components/loading-state';
 import { ADMIN_ORDERS, ADMIN_STATS } from '@/graphql/admin';
 import { formatPrice } from '@/lib/format-price';
 import type { AdminOrdersData, AdminStatsData } from '@/lib/types';
-
-function StatCard({
-  label,
-  value,
-  href,
-  highlight,
-}: {
-  label: string;
-  value: string | number;
-  href?: string;
-  highlight?: boolean;
-}) {
-  const body = (
-    <div
-      className={`h-full border bg-surface p-5 transition-colors ${
-        highlight ? 'border-warning' : 'border-rule'
-      } ${href ? 'hover:border-ink' : ''}`}
-    >
-      <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink-muted">
-        {label}
-      </p>
-      <p className="mt-2 text-2xl font-semibold text-ink">{value}</p>
-    </div>
-  );
-  return href ? <Link href={href}>{body}</Link> : body;
-}
 
 export default function AdminDashboardPage() {
   const stats = useQuery<AdminStatsData>(ADMIN_STATS, {

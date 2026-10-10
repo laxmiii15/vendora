@@ -92,15 +92,15 @@ enum OrderStatus {
   CANCELLED
 }
 
-type CheckoutSession {
-  url: String!
-}
-
 type OrderPage {
   items: [Order!]!
   total: Int!
   page: Int!
   pageSize: Int!
+}
+
+type CheckoutSession {
+  url: String!
 }
 
 type ProductPage {
@@ -126,6 +126,29 @@ type AdminStats {
   lowStockCount: Int!
 }
 
+type SellerOrder {
+  id: ID!
+  status: OrderStatus!
+  items: [OrderItem!]!
+  subtotal: Int!
+  createdAt: DateTime!
+}
+
+type SellerOrderPage {
+  items: [SellerOrder!]!
+  total: Int!
+  page: Int!
+  pageSize: Int!
+}
+
+type SellerStats {
+  revenue: Float!
+  orderCount: Int!
+  awaitingShipmentCount: Int!
+  activeProductCount: Int!
+  lowStockCount: Int!
+}
+
 type Query {
   me: User!
   users: [User!]!
@@ -133,12 +156,15 @@ type Query {
   getProducts(search: String): [Product!]!
   productBySlug(slug: String!): Product!
   getCategories: [Category!]!
-  myOrders: [Order!]!
+  myOrders(page: Int! = 1, pageSize: Int! = 20): OrderPage!
   order(id: ID!): Order!
   adminStats: AdminStats!
-  adminOrders(page: Int! = 1, pageSize: Int! = 20, search: String, status: OrderStatus): OrderPage!
-  adminProducts(page: Int! = 1, pageSize: Int! = 20, search: String, status: ProductStatus): ProductPage!
-  adminUsers(page: Int! = 1, pageSize: Int! = 20, search: String, role: UserRole, status: UserStatus): UserPage!
+  adminOrders(search: String, page: Int! = 1, pageSize: Int! = 20, status: OrderStatus): OrderPage!
+  adminProducts(search: String, page: Int! = 1, pageSize: Int! = 20, status: ProductStatus): ProductPage!
+  adminUsers(search: String, page: Int! = 1, pageSize: Int! = 20, role: UserRole, status: UserStatus): UserPage!
+  sellerStats: SellerStats!
+  sellerProducts(search: String, page: Int! = 1, pageSize: Int! = 20, status: ProductStatus): ProductPage!
+  sellerOrders(page: Int! = 1, pageSize: Int! = 20, status: OrderStatus): SellerOrderPage!
 }
 
 enum UserRole {
@@ -164,6 +190,7 @@ type Mutation {
   updateCategory(id: String!, input: UpdateCategoryInput!): Category!
   deleteCategory(id: String!): Category!
   createOrder(input: CreateOrderInput!): Order!
+  cancelMyOrder(id: ID!): Order!
   updateOrderStatus(id: ID!, status: OrderStatus!): Order!
   createCheckoutSession(orderId: ID!): CheckoutSession!
   updateUserRole(id: ID!, role: UserRole!): User!

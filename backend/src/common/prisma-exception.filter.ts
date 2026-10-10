@@ -5,6 +5,7 @@ import {
   ConflictException,
   HttpException,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
@@ -16,6 +17,8 @@ import { Prisma } from '../generated/prisma/client';
 // a generic 500 "Internal server error".
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaExceptionFilter extends BaseExceptionFilter {
+  private readonly logger = new Logger(PrismaExceptionFilter.name);
+
   catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
     const mapped = this.toHttpException(exception);
 
@@ -47,6 +50,11 @@ export class PrismaExceptionFilter extends BaseExceptionFilter {
           'Operation violates a relation — the record is still referenced or the referenced record does not exist',
         );
       default:
+        // Unmapped codes are real bugs — keep the details in the server log.
+        this.logger.error(
+          `Unhandled Prisma error ${exception.code}: ${exception.message}`,
+          exception.stack,
+        );
         return new InternalServerErrorException();
     }
   }

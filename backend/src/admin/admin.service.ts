@@ -31,13 +31,13 @@ const SAFE_USER_SELECT = {
   updatedAt: true,
 } as const;
 
-const REVENUE_STATUSES = [
+export const REVENUE_STATUSES = [
   OrderStatus.PAID,
   OrderStatus.SHIPPED,
   OrderStatus.DELIVERED,
 ];
 
-const LOW_STOCK_THRESHOLD = 5;
+export const LOW_STOCK_THRESHOLD = 5;
 
 const ELEVATED_ROLES: UserRole[] = [UserRole.ADMIN, UserRole.SUPER_ADMIN];
 

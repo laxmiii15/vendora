@@ -30,10 +30,14 @@ const label = 'text-sm font-medium text-ink';
 export function ProductForm({
   product,
   onDone,
+  refetchQueries = ['AdminProducts', 'AdminStats'],
 }: {
   // Omitted when creating a new product.
   product?: AdminProduct;
   onDone: () => void;
+  // Operation names to refresh after saving, so the form works for both the
+  // admin and seller dashboards.
+  refetchQueries?: string[];
 }) {
   const isEdit = !!product;
   const { data: categoryData } = useQuery<GetCategoriesData>(GET_CATEGORIES);
@@ -52,12 +56,8 @@ export function ProductForm({
   const [categoryId, setCategoryId] = useState(product?.categoryId ?? '');
   const [error, setError] = useState<string | null>(null);
 
-  const [runCreate, createState] = useMutation(CREATE_PRODUCT, {
-    refetchQueries: ['AdminProducts', 'AdminStats'],
-  });
-  const [runUpdate, updateState] = useMutation(UPDATE_PRODUCT, {
-    refetchQueries: ['AdminStats'],
-  });
+  const [runCreate, createState] = useMutation(CREATE_PRODUCT, { refetchQueries });
+  const [runUpdate, updateState] = useMutation(UPDATE_PRODUCT, { refetchQueries });
   const saving = createState.loading || updateState.loading;
 
   async function handleSubmit(event: FormEvent) {

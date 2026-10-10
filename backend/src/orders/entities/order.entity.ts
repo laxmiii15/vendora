@@ -1,4 +1,5 @@
 import { Field, ID, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Paginated } from '../../common/paginated';
 import { OrderStatus } from '../../generated/prisma/enums';
 import { User } from '../../users/entities/user.entity';
 import { OrderItem } from './order-item.entity';
@@ -34,3 +35,6 @@ export class Order {
   @Field()
   updatedAt: Date;
 }
+
+@ObjectType()
+export class OrderPage extends Paginated(Order) {}

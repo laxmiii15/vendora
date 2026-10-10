@@ -34,6 +34,15 @@ export const CREATE_CHECKOUT_SESSION = gql`
   }
 `;
 
+export const CANCEL_MY_ORDER = gql`
+  mutation CancelMyOrder($id: ID!) {
+    cancelMyOrder(id: $id) {
+      id
+      status
+    }
+  }
+`;
+
 export const REGISTER = gql`
   mutation Register(
     $email: String!

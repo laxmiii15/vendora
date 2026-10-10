@@ -49,7 +49,9 @@ export class ProductResolver {
 
   @Mutation(() => Product)
   @UseGuards(GqlJwtAuthGuard, RolesGuard)
-  @Roles(UserRole.SELLER, UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  // Admin-only: sellers archive instead, so products referenced by past
+  // orders are never hard-deleted by accident.
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   async deleteProduct(
     @CurrentUser() user: User,
     @Args('id', { type: () => ID }) id: string,

@@ -1,5 +1,6 @@
-import { ArgsType, Field, Int, registerEnumType } from '@nestjs/graphql';
-import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { ArgsType, Field, registerEnumType } from '@nestjs/graphql';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { PageArgs } from '../../common/paginated';
 import {
   OrderStatus,
   ProductStatus,
@@ -11,18 +12,7 @@ registerEnumType(UserRole, { name: 'UserRole' });
 registerEnumType(UserStatus, { name: 'UserStatus' });
 
 @ArgsType()
-export class PaginationArgs {
-  @Field(() => Int, { defaultValue: 1 })
-  @IsInt()
-  @Min(1)
-  page: number;
-
-  @Field(() => Int, { defaultValue: 20 })
-  @IsInt()
-  @Min(1)
-  @Max(100)
-  pageSize: number;
-
+export class PaginationArgs extends PageArgs {
   @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
