@@ -7,7 +7,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Product } from './entities/product.entity';
 import { CreateProductInput, UpdateProductInput } from './dto/product.input';
 import { User } from 'src/users/entities/user.entity';
-import { UserRole } from 'src/generated/prisma/enums';
+import { ProductStatus, UserRole } from 'src/generated/prisma/enums';
+
+// Statuses the public storefront may see. DRAFT and ARCHIVED are only
+// reachable through the seller and admin queries.
+const PUBLIC_STATUSES: ProductStatus[] = [
+  ProductStatus.ACTIVE,
+  ProductStatus.OUT_OF_STOCK,
+];
 
 @Injectable()
 export class ProductService {
@@ -16,22 +23,25 @@ export class ProductService {
   async getProducts(search?: string): Promise<Product[]> {
     const trimmed = search?.trim();
     const products = await this.prisma.product.findMany({
-      where: trimmed
-        ? {
-            OR: [
-              { name: { contains: trimmed, mode: 'insensitive' } },
-              { description: { contains: trimmed, mode: 'insensitive' } },
-            ],
-          }
-        : undefined,
+      where: {
+        status: { in: PUBLIC_STATUSES },
+        ...(trimmed && {
+          OR: [
+            { name: { contains: trimmed, mode: 'insensitive' } },
+            { description: { contains: trimmed, mode: 'insensitive' } },
+          ],
+        }),
+      },
       include: { category: true },
     });
     return products;
   }
 
   async getProductBySlug(slug: string): Promise<Product> {
+    // Hidden products get the same "not found" as missing ones, so their
+    // slugs can't be probed.
     const product = await this.prisma.product.findUnique({
-      where: { slug },
+      where: { slug, status: { in: PUBLIC_STATUSES } },
       include: { category: true },
     });
     if (!product) {

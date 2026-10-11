@@ -46,11 +46,8 @@ function HomeContent() {
 
   const categories = categoriesResult.data?.getCategories ?? [];
 
-  // Anonymous visitors should only ever see live, purchasable products —
-  // `getProducts` doesn't filter server-side, so DRAFT/ARCHIVED are excluded here.
-  const activeProducts = (productsResult.data?.getProducts ?? []).filter(
-    (product) => product.status !== 'DRAFT' && product.status !== 'ARCHIVED',
-  );
+  // `getProducts` already excludes DRAFT/ARCHIVED on the server.
+  const activeProducts = productsResult.data?.getProducts ?? [];
   const visibleProducts = selectedCategoryId
     ? activeProducts.filter(
         (product) => product.categoryId === selectedCategoryId,

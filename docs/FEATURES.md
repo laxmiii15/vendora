@@ -41,7 +41,7 @@ Only admins can change someone's role (for example, to make a customer a seller)
 
 Customers can browse without an account; they only need to log in at checkout.
 
-- **Home page:** a banner, a strip of categories, and a grid of products. Draft and archived products are left out of the grid.
+- **Home page:** a banner, a strip of categories, and a grid of products. Draft and archived products are left out — the server never sends them to the shop.
 - **Categories:** clicking a category (on the strip or in the header menu) shows only that category's products.
 - **Search:** the search box in the header finds products whose name or description contains the words typed, ignoring capital letters.
 - **Product page:** each product has its own page (by its slug, the short web-address name like `classic-blue-jeans`) with photo, description, size, price and an Add to cart button. Out-of-stock products can't be added.
@@ -172,7 +172,7 @@ Restart the backend server first — it is still running yesterday's code. The o
 
 **Gaps found along the way**
 
-- [ ] **Draft and archived products are only hidden by the website.** The server still returns them to anyone who asks the product list or opens a product's web address directly. The server should filter them out.
+- [x] **Draft and archived products are hidden by the server** (fixed 2026-10-11). The shop's product list and product pages only return products that are for sale or out of stock; a draft or archived product's web address says "product not found". Sellers and admins still see them in their own dashboards.
 - [ ] **The shop's product list has no pages.** It loads every product at once, which will get slow as the catalogue grows.
 - [ ] **Abandoned checkouts keep items reserved.** When Stripe reports an expired checkout, the payment code should call the existing "cancel order" step so stock comes back. (This sits in the payment code, which you are building yourself.)
 - [ ] **No automated tests yet.** Today's checks were run by hand against the database.
