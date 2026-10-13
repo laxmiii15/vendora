@@ -11,23 +11,38 @@ export const GET_CATEGORIES = gql`
 `;
 
 export const GET_PRODUCTS = gql`
-  query GetProducts($search: String) {
-    getProducts(search: $search) {
-      id
-      name
-      slug
-      description
-      price
-      stock
-      status
-      size
-      imageUrl
-      categoryId
-      category {
+  query GetProducts(
+    $search: String
+    $categoryId: String
+    $page: Int!
+    $pageSize: Int!
+  ) {
+    getProducts(
+      search: $search
+      categoryId: $categoryId
+      page: $page
+      pageSize: $pageSize
+    ) {
+      items {
         id
         name
         slug
+        description
+        price
+        stock
+        status
+        size
+        imageUrl
+        categoryId
+        category {
+          id
+          name
+          slug
+        }
       }
+      total
+      page
+      pageSize
     }
   }
 `;

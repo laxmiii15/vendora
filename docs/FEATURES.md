@@ -1,6 +1,6 @@
 # Vendora: What We've Built So Far
 
-_Last updated: 2026-10-10_
+_Last updated: 2026-10-13_
 
 ## What Vendora is
 
@@ -42,8 +42,9 @@ Only admins can change someone's role (for example, to make a customer a seller)
 Customers can browse without an account; they only need to log in at checkout.
 
 - **Home page:** a banner, a strip of categories, and a grid of products. Draft and archived products are left out — the server never sends them to the shop.
-- **Categories:** clicking a category (on the strip or in the header menu) shows only that category's products.
+- **Categories:** clicking a category (on the strip or in the header menu) shows only that category's products. Clicking it again goes back to all products.
 - **Search:** the search box in the header finds products whose name or description contains the words typed, ignoring capital letters.
+- **Pages:** the shop shows 12 products per page, newest first, with Previous and Next buttons under the grid. The page and category are in the web address (for example `/?category=…&page=2`), so the back button, refreshing and shared links all keep your place. Choosing a category or searching starts again at page 1.
 - **Product page:** each product has its own page (by its slug, the short web-address name like `classic-blue-jeans`) with photo, description, size, price and an Add to cart button. Out-of-stock products can't be added.
 - **Prices:** shown in whole US dollars (for example $55.00). Cents are not used.
 - **Cart:** items, quantities and the running total. You can change quantities or remove items. The cart is saved in your browser, so it survives a page refresh, but it isn't tied to your account — a different device has a different cart.
@@ -173,7 +174,7 @@ Restart the backend server first — it is still running yesterday's code. The o
 **Gaps found along the way**
 
 - [x] **Draft and archived products are hidden by the server** (fixed 2026-10-11). The shop's product list and product pages only return products that are for sale or out of stock; a draft or archived product's web address says "product not found". Sellers and admins still see them in their own dashboards.
-- [ ] **The shop's product list has no pages.** It loads every product at once, which will get slow as the catalogue grows.
+- [x] **The shop's product list has pages** (fixed 2026-10-13). The server sends 12 products at a time and filters by category itself, so the shop stays fast as the catalogue grows.
 - [ ] **Abandoned checkouts keep items reserved.** When Stripe reports an expired checkout, the payment code should call the existing "cancel order" step so stock comes back. (This sits in the payment code, which you are building yourself.)
 - [ ] **No automated tests yet.** Today's checks were run by hand against the database.
 

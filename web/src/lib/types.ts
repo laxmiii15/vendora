@@ -54,7 +54,7 @@ export interface GetCategoriesData {
 }
 
 export interface GetProductsData {
-  getProducts: Product[];
+  getProducts: Paginated<Product>;
 }
 
 export interface GetProductBySlugData {
