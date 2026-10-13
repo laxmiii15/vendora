@@ -1,10 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Paginated } from '../../common/paginated';
-import { Product } from '../../products/entities/product.entity';
 import { User } from '../../users/entities/user.entity';
-
-@ObjectType()
-export class ProductPage extends Paginated(Product) {}
 
 @ObjectType()
 export class UserPage extends Paginated(User) {}

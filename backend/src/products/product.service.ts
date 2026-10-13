@@ -6,6 +6,9 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Product } from './entities/product.entity';
 import { CreateProductInput, UpdateProductInput } from './dto/product.input';
+import { ProductsArgs } from './dto/products.args';
+import { ProductPage } from './entities/product-page.entity';
+import { Prisma } from 'src/generated/prisma/client';
 import { User } from 'src/users/entities/user.entity';
 import { ProductStatus, UserRole } from 'src/generated/prisma/enums';
 
@@ -20,21 +23,38 @@ const PUBLIC_STATUSES: ProductStatus[] = [
 export class ProductService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getProducts(search?: string): Promise<Product[]> {
+  async getProducts({
+    page,
+    pageSize,
+    search,
+    categoryId,
+  }: ProductsArgs): Promise<ProductPage> {
     const trimmed = search?.trim();
-    const products = await this.prisma.product.findMany({
-      where: {
-        status: { in: PUBLIC_STATUSES },
-        ...(trimmed && {
-          OR: [
-            { name: { contains: trimmed, mode: 'insensitive' } },
-            { description: { contains: trimmed, mode: 'insensitive' } },
-          ],
-        }),
-      },
-      include: { category: true },
-    });
-    return products;
+    const where: Prisma.ProductWhereInput = {
+      status: { in: PUBLIC_STATUSES },
+      ...(categoryId && { categoryId }),
+      ...(trimmed && {
+        OR: [
+          { name: { contains: trimmed, mode: 'insensitive' } },
+          { description: { contains: trimmed, mode: 'insensitive' } },
+        ],
+      }),
+    };
+
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.product.findMany({
+        where,
+        include: { category: true },
+        // id breaks ties so products sharing a createdAt never repeat or
+        // go missing between pages.
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      this.prisma.product.count({ where }),
+    ]);
+
+    return { items, total, page, pageSize };
   }
 
   async getProductBySlug(slug: string): Promise<Product> {

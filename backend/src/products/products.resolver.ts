@@ -1,6 +1,8 @@
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ProductService } from './product.service';
 import { Product } from './entities/product.entity';
+import { ProductPage } from './entities/product-page.entity';
+import { ProductsArgs } from './dto/products.args';
 import { CreateProductInput, UpdateProductInput } from './dto/product.input';
 import { UseGuards } from '@nestjs/common';
 import { GqlJwtAuthGuard } from 'src/auth/guards/auth.guard';
@@ -14,11 +16,9 @@ import { UserRole } from 'src/generated/prisma/client';
 export class ProductResolver {
   constructor(private readonly productService: ProductService) {}
 
-  @Query(() => [Product])
-  getProducts(
-    @Args('search', { type: () => String, nullable: true }) search?: string,
-  ): Promise<Product[]> {
-    return this.productService.getProducts(search);
+  @Query(() => ProductPage)
+  getProducts(@Args() args: ProductsArgs): Promise<ProductPage> {
+    return this.productService.getProducts(args);
   }
 
   @Query(() => Product, { name: 'productBySlug' })
