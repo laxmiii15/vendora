@@ -4,7 +4,7 @@ import { useMutation } from '@apollo/client/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
-import { AuthLayout, authLink } from '@/components/auth-layout';
+import { AuthError, AuthLayout, authLink } from '@/components/auth-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LOGIN } from '@/graphql/mutations';
@@ -70,8 +70,13 @@ export default function LoginPage() {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
         />
-        {formError && <p className="text-xs text-danger">{formError}</p>}
-        <Button type="submit" variant="solid" disabled={loading} className="mt-2 w-full">
+        {formError && <AuthError>{formError}</AuthError>}
+        <Button
+          type="submit"
+          variant="solid"
+          disabled={loading}
+          className="mt-2 w-full"
+        >
           {loading ? 'Logging in…' : 'Log in'}
         </Button>
       </form>

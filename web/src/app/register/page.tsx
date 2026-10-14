@@ -4,7 +4,7 @@ import { useMutation } from '@apollo/client/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
-import { AuthLayout, authLink } from '@/components/auth-layout';
+import { AuthError, AuthLayout, authLink } from '@/components/auth-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { REGISTER } from '@/graphql/mutations';
@@ -99,10 +99,17 @@ export default function RegisterPage() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
-          <p className="mt-1.5 text-[11px] text-ink-muted">At least 8 characters.</p>
+          <p className="mt-1.5 text-[11px] text-ink-muted">
+            At least 8 characters.
+          </p>
         </div>
-        {formError && <p className="text-xs text-danger">{formError}</p>}
-        <Button type="submit" variant="solid" disabled={loading} className="mt-2 w-full">
+        {formError && <AuthError>{formError}</AuthError>}
+        <Button
+          type="submit"
+          variant="solid"
+          disabled={loading}
+          className="mt-2 w-full"
+        >
           {loading ? 'Creating account…' : 'Create account'}
         </Button>
       </form>
