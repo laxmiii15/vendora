@@ -21,14 +21,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             ref={ref}
             id={inputId}
             placeholder=" "
-            className={`peer h-13 w-full border bg-surface px-4 pt-4 text-sm text-ink outline-none transition-colors focus:border-ink ${
+            className={`peer h-16 w-full border bg-surface px-4 pt-5 text-[15px] text-ink outline-none transition-colors focus:border-ink ${
               error ? 'border-danger' : 'border-rule'
             } ${className}`}
             {...props}
           />
           <label
             htmlFor={inputId}
-            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-ink-muted transition-all peer-focus:top-3 peer-focus:text-[11px] peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:text-[11px]"
+            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-ink-muted transition-all peer-focus:top-3.5 peer-focus:text-xs peer-[:not(:placeholder-shown)]:top-3.5 peer-[:not(:placeholder-shown)]:text-xs"
           >
             {label}
             {props.required ? ' *' : ''}

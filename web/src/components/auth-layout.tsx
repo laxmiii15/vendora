@@ -56,14 +56,14 @@ export function AuthLayout({
         </div>
 
         <main className="flex flex-1 items-center justify-center px-6 py-12 sm:px-10">
-          <div className="w-full max-w-[400px]">
-            <p className="inline-block border-b border-ink pb-0.5 text-[11px] font-medium uppercase tracking-[0.2em] text-ink">
+          <div className="w-full max-w-[480px]">
+            <p className="inline-block border-b border-ink pb-1 text-xs font-medium uppercase tracking-[0.2em] text-ink">
               {eyebrow}
             </p>
-            <h1 className="mt-5 font-display text-[34px] leading-tight font-semibold text-ink">
+            <h1 className="mt-6 font-display text-[42px] leading-tight font-semibold text-ink">
               {title}
             </h1>
-            {children}
+            <div className="mt-8">{children}</div>
             <p className="mt-6 text-sm text-ink-muted">{footer}</p>
           </div>
         </main>

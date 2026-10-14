@@ -58,7 +58,7 @@ export default function RegisterPage() {
         </>
       }
     >
-      <form onSubmit={handleSubmit} className="mt-2 flex flex-col gap-3">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-3">
           <Input
             variant="boxed"
@@ -108,7 +108,7 @@ export default function RegisterPage() {
           type="submit"
           variant="solid"
           disabled={loading}
-          className="mt-2 w-full"
+          className="mt-3 w-full"
         >
           {loading ? 'Creating account…' : 'Create account'}
         </Button>
