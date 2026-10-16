@@ -10,6 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderInput } from './dto/order.input';
 import { User } from '../users/entities/user.entity';
 import {
+  FulfillmentStatus,
   OrderStatus,
   ProductStatus,
   UserRole,
@@ -33,11 +34,12 @@ export class OrdersService {
   async createOrder(input: CreateOrderInput, customer: User) {
     return this.prisma.$transaction(async (tx) => {
       let total = 0;
-      const itemsData: {
-        productId: string;
-        quantity: number;
-        unitPrice: number;
-      }[] = [];
+      // Lines grouped by seller: each seller ships their slice of the order
+      // as its own fulfillment.
+      const itemsBySeller = new Map<
+        string,
+        { productId: string; quantity: number; unitPrice: number }[]
+      >();
 
       for (const item of input.items) {
         const product = await tx.product.findUnique({
@@ -67,20 +69,36 @@ export class OrdersService {
           );
         }
 
-        itemsData.push({
+        const sellerItems = itemsBySeller.get(product.sellerId) ?? [];
+        sellerItems.push({
           productId: product.id,
           quantity: item.quantity,
           unitPrice: product.price,
         });
+        itemsBySeller.set(product.sellerId, sellerItems);
         total += product.price * item.quantity;
       }
 
-      return tx.order.create({
-        data: {
-          customerId: customer.id,
-          total,
-          items: { create: itemsData },
-        },
+      const order = await tx.order.create({
+        data: { customerId: customer.id, total },
+      });
+
+      // Items need both orderId and fulfillmentId, so they're created under
+      // each fulfillment once the order exists.
+      for (const [sellerId, items] of itemsBySeller) {
+        await tx.fulfillment.create({
+          data: {
+            orderId: order.id,
+            sellerId,
+            items: {
+              create: items.map((item) => ({ ...item, orderId: order.id })),
+            },
+          },
+        });
+      }
+
+      return tx.order.findUniqueOrThrow({
+        where: { id: order.id },
         include: ORDER_INCLUDE,
       });
     });
@@ -196,6 +214,11 @@ export class OrdersService {
       if (cancelled.count === 0) {
         throw new ConflictException('Order is no longer pending');
       }
+
+      await tx.fulfillment.updateMany({
+        where: { orderId: id },
+        data: { status: FulfillmentStatus.CANCELLED },
+      });
 
       for (const item of order.items) {
         await tx.product.update({

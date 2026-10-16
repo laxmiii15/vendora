@@ -45,6 +45,15 @@ enum OrderStatus {
   CANCELLED
 }
 
+// Per-seller progress on one order. CANCELLED only ever follows the whole
+// order being cancelled — sellers can't cancel their part on their own.
+enum FulfillmentStatus {
+  PENDING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
 model User {
   id        String     @id @default(cuid())
   email     String     @unique
@@ -54,8 +63,9 @@ model User {
   role      UserRole   @default(CUSTOMER)
   status    UserStatus @default(ACTIVE)
 
-  products Product[]
-  orders   Order[]
+  products     Product[]
+  orders       Order[]
+  fulfillments Fulfillment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -103,13 +113,14 @@ model Category {
 }
 
 model Order {
-  id      String      @id @default(cuid())
+  id         String      @id @default(cuid())
   customerId String
   customer   User        @relation(fields: [customerId], references: [id])
-  status  OrderStatus @default(PENDING)
-  total   Int
+  status     OrderStatus @default(PENDING)
+  total      Int
 
-  items OrderItem[]
+  items        OrderItem[]
+  fulfillments Fulfillment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -119,14 +130,37 @@ model Order {
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id])
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-  quantity  Int
-  unitPrice Int
+  id            String      @id @default(cuid())
+  orderId       String
+  order         Order       @relation(fields: [orderId], references: [id])
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id])
+  fulfillmentId String
+  fulfillment   Fulfillment @relation(fields: [fulfillmentId], references: [id])
+  quantity      Int
+  unitPrice     Int
 
   @@index([orderId])
   @@index([productId])
+  @@index([fulfillmentId])
+}
+
+// One row per (order, seller): the slice of an order a single seller ships.
+model Fulfillment {
+  id             String            @id @default(cuid())
+  orderId        String
+  order          Order             @relation(fields: [orderId], references: [id])
+  sellerId       String
+  seller         User              @relation(fields: [sellerId], references: [id])
+  status         FulfillmentStatus @default(PENDING)
+  trackingNumber String?
+  shippedAt      DateTime?
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orderId, sellerId])
+  @@index([sellerId, status])
 }
