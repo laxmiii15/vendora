@@ -170,22 +170,93 @@ export class OrdersService {
 
     this.assertTransitionAllowed(order.status, status);
 
-    // Conditional on the status we just read: if another request changed it in
-    // between, count is 0 and we reject instead of overwriting their change.
-    const updated = await this.prisma.order.updateMany({
-      where: { id, status: order.status },
-      data: { status },
+    return this.prisma.$transaction(async (tx) => {
+      // Conditional on the status we just read: if another request changed it
+      // in between, count is 0 and we reject instead of overwriting their change.
+      const updated = await tx.order.updateMany({
+        where: { id, status: order.status },
+        data: { status },
+      });
+
+      if (updated.count === 0) {
+        throw new ConflictException(
+          'Order status changed concurrently, please retry',
+        );
+      }
+
+      // An admin override applies to every seller's part of the order, so the
+      // order and its fulfillments never disagree.
+      if (status === OrderStatus.SHIPPED) {
+        await tx.fulfillment.updateMany({
+          where: { orderId: id, status: FulfillmentStatus.PENDING },
+          data: { status: FulfillmentStatus.SHIPPED, shippedAt: new Date() },
+        });
+      } else if (status === OrderStatus.DELIVERED) {
+        await tx.fulfillment.updateMany({
+          where: { orderId: id, status: { not: FulfillmentStatus.CANCELLED } },
+          data: { status: FulfillmentStatus.DELIVERED },
+        });
+      }
+
+      return tx.order.findUniqueOrThrow({
+        where: { id },
+        include: ORDER_INCLUDE,
+      });
     });
+  }
 
-    if (updated.count === 0) {
-      throw new ConflictException(
-        'Order status changed concurrently, please retry',
-      );
-    }
+  // A seller ships their part of a paid order. Once every part is shipped the
+  // order itself moves to SHIPPED.
+  async shipFulfillment(id: string, seller: User, trackingNumber?: string) {
+    await this.prisma.$transaction(async (tx) => {
+      const fulfillment = await tx.fulfillment.findUnique({ where: { id } });
 
-    return this.prisma.order.findUniqueOrThrow({
-      where: { id },
-      include: ORDER_INCLUDE,
+      if (!fulfillment) {
+        throw new NotFoundException('Fulfillment not found');
+      }
+
+      if (fulfillment.sellerId !== seller.id) {
+        throw new ForbiddenException('You can only ship your own orders');
+      }
+
+      // Lock the order row so concurrent shipments of the same order run one
+      // at a time; otherwise each could still see the other's part as PENDING
+      // and the order would never move to SHIPPED.
+      await tx.$queryRaw`SELECT 1 FROM "Order" WHERE "id" = ${fulfillment.orderId} FOR UPDATE`;
+
+      const order = await tx.order.findUniqueOrThrow({
+        where: { id: fulfillment.orderId },
+      });
+
+      if (order.status !== OrderStatus.PAID) {
+        throw new BadRequestException(
+          `Only paid orders can be shipped (order is ${order.status})`,
+        );
+      }
+
+      const shipped = await tx.fulfillment.updateMany({
+        where: { id, status: FulfillmentStatus.PENDING },
+        data: {
+          status: FulfillmentStatus.SHIPPED,
+          trackingNumber: trackingNumber?.trim() || null,
+          shippedAt: new Date(),
+        },
+      });
+
+      if (shipped.count === 0) {
+        throw new ConflictException('This order has already been shipped');
+      }
+
+      const stillPending = await tx.fulfillment.count({
+        where: { orderId: order.id, status: FulfillmentStatus.PENDING },
+      });
+
+      if (stillPending === 0) {
+        await tx.order.update({
+          where: { id: order.id },
+          data: { status: OrderStatus.SHIPPED },
+        });
+      }
     });
   }
 

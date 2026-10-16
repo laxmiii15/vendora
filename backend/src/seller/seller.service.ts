@@ -1,21 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { LOW_STOCK_THRESHOLD, REVENUE_STATUSES } from '../admin/admin.service';
 import { Prisma } from '../generated/prisma/client';
-import { OrderStatus, ProductStatus } from '../generated/prisma/enums';
+import {
+  FulfillmentStatus,
+  OrderStatus,
+  ProductStatus,
+} from '../generated/prisma/enums';
+import { OrdersService } from '../orders/orders.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '../users/entities/user.entity';
-import { SellerOrdersArgs, SellerProductsArgs } from './dto/seller.args';
+import {
+  MarkFulfillmentShippedArgs,
+  SellerOrdersArgs,
+  SellerProductsArgs,
+} from './dto/seller.args';
 
-// Every query in this service is scoped to the calling seller's products.
+const SELLER_ORDER_INCLUDE = {
+  items: { include: { product: true } },
+  order: { select: { status: true } },
+} as const;
+
+type FulfillmentWithOrder = Prisma.FulfillmentGetPayload<{
+  include: typeof SELLER_ORDER_INCLUDE;
+}>;
+
+// Every query in this service is scoped to the calling seller's products and
+// fulfillments.
 @Injectable()
 export class SellerService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ordersService: OrdersService,
+  ) {}
 
   async getStats(seller: User) {
-    const hasMyItems: Prisma.OrderWhereInput = {
-      items: { some: { product: { sellerId: seller.id } } },
-    };
-
     // Prisma can't aggregate quantity * unitPrice, so revenue is raw SQL.
     const revenueQuery = this.prisma.$queryRaw<{ revenue: bigint | null }[]>`
       SELECT SUM(oi."unitPrice" * oi."quantity") AS revenue
@@ -34,11 +52,18 @@ export class SellerService {
       lowStockCount,
     ] = await this.prisma.$transaction([
       revenueQuery,
-      this.prisma.order.count({
-        where: { ...hasMyItems, status: { not: OrderStatus.CANCELLED } },
+      this.prisma.fulfillment.count({
+        where: {
+          sellerId: seller.id,
+          status: { not: FulfillmentStatus.CANCELLED },
+        },
       }),
-      this.prisma.order.count({
-        where: { ...hasMyItems, status: OrderStatus.PAID },
+      this.prisma.fulfillment.count({
+        where: {
+          sellerId: seller.id,
+          status: FulfillmentStatus.PENDING,
+          order: { status: OrderStatus.PAID },
+        },
       }),
       this.prisma.product.count({
         where: { sellerId: seller.id, status: ProductStatus.ACTIVE },
@@ -94,36 +119,57 @@ export class SellerService {
   }
 
   async findOrders(seller: User, { page, pageSize, status }: SellerOrdersArgs) {
-    const myItems = { product: { sellerId: seller.id } };
-    const where: Prisma.OrderWhereInput = {
-      items: { some: myItems },
+    const where: Prisma.FulfillmentWhereInput = {
+      sellerId: seller.id,
       ...(status ? { status } : {}),
     };
 
-    const [orders, total] = await this.prisma.$transaction([
-      this.prisma.order.findMany({
+    const [fulfillments, total] = await this.prisma.$transaction([
+      this.prisma.fulfillment.findMany({
         where,
-        // Only load this seller's lines — other sellers' items never leave
-        // the database.
-        include: { items: { where: myItems, include: { product: true } } },
+        include: SELLER_ORDER_INCLUDE,
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
-      this.prisma.order.count({ where }),
+      this.prisma.fulfillment.count({ where }),
     ]);
 
-    const items = orders.map((order) => ({
-      id: order.id,
-      status: order.status,
-      createdAt: order.createdAt,
-      items: order.items,
-      subtotal: order.items.reduce(
-        (sum, item) => sum + item.unitPrice * item.quantity,
-        0,
-      ),
-    }));
-
-    return { items, total, page, pageSize };
+    return {
+      items: fulfillments.map(toSellerOrder),
+      total,
+      page,
+      pageSize,
+    };
   }
+
+  async markShipped(
+    seller: User,
+    { id, trackingNumber }: MarkFulfillmentShippedArgs,
+  ) {
+    await this.ordersService.shipFulfillment(id, seller, trackingNumber);
+
+    const fulfillment = await this.prisma.fulfillment.findUniqueOrThrow({
+      where: { id },
+      include: SELLER_ORDER_INCLUDE,
+    });
+    return toSellerOrder(fulfillment);
+  }
+}
+
+function toSellerOrder(fulfillment: FulfillmentWithOrder) {
+  return {
+    id: fulfillment.id,
+    orderId: fulfillment.orderId,
+    status: fulfillment.status,
+    orderStatus: fulfillment.order.status,
+    trackingNumber: fulfillment.trackingNumber,
+    shippedAt: fulfillment.shippedAt,
+    items: fulfillment.items,
+    subtotal: fulfillment.items.reduce(
+      (sum, item) => sum + item.unitPrice * item.quantity,
+      0,
+    ),
+    createdAt: fulfillment.createdAt,
+  };
 }

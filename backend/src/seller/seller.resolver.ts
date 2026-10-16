@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ProductPage } from '../products/entities/product-page.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -7,13 +7,22 @@ import { GqlJwtAuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../generated/prisma/enums';
 import { User } from '../users/entities/user.entity';
-import { SellerOrdersArgs, SellerProductsArgs } from './dto/seller.args';
-import { SellerOrderPage, SellerStats } from './entities/seller.entities';
+import {
+  MarkFulfillmentShippedArgs,
+  SellerOrdersArgs,
+  SellerProductsArgs,
+} from './dto/seller.args';
+import {
+  SellerOrder,
+  SellerOrderPage,
+  SellerStats,
+} from './entities/seller.entities';
 import { SellerService } from './seller.service';
 
-// Read-only by design: sellers manage listings through the existing product
-// mutations (which check ownership); order status stays with admins.
-// Admins are allowed in too and see their own listings.
+// Sellers manage listings through the existing product mutations (which check
+// ownership) and ship their own part of each order here; the order's status
+// otherwise stays with admins. Admins are allowed in too and see their own
+// listings.
 @Resolver()
 @UseGuards(GqlJwtAuthGuard, RolesGuard)
 @Roles(UserRole.SELLER, UserRole.ADMIN, UserRole.SUPER_ADMIN)
@@ -36,5 +45,13 @@ export class SellerResolver {
   @Query(() => SellerOrderPage)
   sellerOrders(@CurrentUser() seller: User, @Args() args: SellerOrdersArgs) {
     return this.sellerService.findOrders(seller, args);
+  }
+
+  @Mutation(() => SellerOrder)
+  markFulfillmentShipped(
+    @CurrentUser() seller: User,
+    @Args() args: MarkFulfillmentShippedArgs,
+  ) {
+    return this.sellerService.markShipped(seller, args);
   }
 }

@@ -128,10 +128,21 @@ type AdminStats {
 
 type SellerOrder {
   id: ID!
-  status: OrderStatus!
+  orderId: ID!
+  status: FulfillmentStatus!
+  orderStatus: OrderStatus!
+  trackingNumber: String
+  shippedAt: DateTime
   items: [OrderItem!]!
   subtotal: Int!
   createdAt: DateTime!
+}
+
+enum FulfillmentStatus {
+  PENDING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
 
 type SellerOrderPage {
@@ -164,7 +175,7 @@ type Query {
   adminUsers(search: String, page: Int! = 1, pageSize: Int! = 20, role: UserRole, status: UserStatus): UserPage!
   sellerStats: SellerStats!
   sellerProducts(search: String, page: Int! = 1, pageSize: Int! = 20, status: ProductStatus): ProductPage!
-  sellerOrders(page: Int! = 1, pageSize: Int! = 20, status: OrderStatus): SellerOrderPage!
+  sellerOrders(page: Int! = 1, pageSize: Int! = 20, status: FulfillmentStatus): SellerOrderPage!
 }
 
 enum UserRole {
@@ -195,6 +206,7 @@ type Mutation {
   createCheckoutSession(orderId: ID!): CheckoutSession!
   updateUserRole(id: ID!, role: UserRole!): User!
   updateUserStatus(id: ID!, status: UserStatus!): User!
+  markFulfillmentShipped(id: ID!, trackingNumber: String): SellerOrder!
 }
 
 input RegisterInput {
